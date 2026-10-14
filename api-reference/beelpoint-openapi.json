@@ -1,0 +1,2149 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BeelPoint API",
+    "version": "1.0.0",
+    "description": "BeelPoint connects your business to the Federal Inland Revenue Service (FIRS) for e-invoicing and tax compliance in Nigeria. Use these endpoints to retrieve reference data, validate and sign invoices, generate Invoice Reference Numbers (IRN) and confirm transmission.",
+    "contact": {
+      "name": "BeelPoint Support",
+      "email": "support@telepacafrica.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.beelpoint.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Invoicing",
+      "description": "Create, sign and retrieve invoices."
+    }
+  ],
+  "paths": {
+    "/v1/api/invoices/types": {
+      "get": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Retrieve Invoice Types",
+        "operationId": "getInvoiceTypes",
+        "description": "Returns the list of invoice types available in the Beelpoint API.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "invoiceTypes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "Code of the invoice type"
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "Name or description of the invoice type"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "invoiceTypes": [
+                    {
+                      "code": "380",
+                      "value": "Credit Note"
+                    },
+                    {
+                      "code": "381",
+                      "value": "Commercial Invoice"
+                    },
+                    {
+                      "code": "384",
+                      "value": "Debit Note"
+                    },
+                    {
+                      "code": "385",
+                      "value": "Self Billed Invoice"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404NotFound"
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/hsn-codes": {
+      "get": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Retrieve HSN Codes",
+        "operationId": "getHsnCodes",
+        "description": "Retrieves Harmonized System of Nomenclature (HSN) codes, each with a code and a description.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "HSN code"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "HSN code description"
+                          }
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Cases successfully retrieved!",
+                  "data": [
+                    {
+                      "code": "6815.99",
+                      "description": "Stone articles and articles of other mineral substances; n.e.c. or included in heading no. 6815"
+                    },
+                    {
+                      "code": "6901.00",
+                      "description": "Bricks, blocks, tiles and other ceramic goods of siliceous fossil meals (e.g. kieselguhr, tripolite or diatomite) or of similar siliceous earths"
+                    }
+                  ],
+                  "links": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api/invoices": {
+      "get": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Retrieve All Invoices",
+        "operationId": "listInvoices",
+        "description": "Retrieves invoices for your business with pagination details.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "invoices": {
+                          "type": "object",
+                          "properties": {
+                            "docs": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/InvoiceResponse"
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "$ref": "#/components/schemas/Pagination"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Invoices retrieved successfully!",
+                  "data": {
+                    "invoices": {
+                      "docs": [
+                        {
+                          "payment_status": "PENDING",
+                          "irn": "INV00XXX-3D97BAAA-20240917",
+                          "issue_date": "2024-09-17",
+                          "invoice_type_code": "381",
+                          "document_currency_code": "NGN"
+                        }
+                      ]
+                    },
+                    "pagination": {
+                      "totalDocs": 1,
+                      "perPage": 20,
+                      "totalPages": 1,
+                      "currentPage": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/{id}": {
+      "get": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Retrieve Invoice Details",
+        "operationId": "getInvoice",
+        "description": "Retrieves the details of a single invoice by its unique ID.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Invoice unique ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "statusCode": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "invoice": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/InvoiceResponse"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "statusCode": 200,
+                  "message": "Invoice retrieved successfully!",
+                  "data": {
+                    "invoice": [
+                      {
+                        "payment_status": "PENDING",
+                        "irn": "INV00XXX-3D97BAAA-20240917",
+                        "issue_date": "2024-09-17",
+                        "invoice_type_code": "381",
+                        "document_currency_code": "NGN"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invoice not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "statusCode": 404,
+                  "message": "Invoice not found."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/sign": {
+      "post": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Sign an Invoice",
+        "operationId": "signInvoice",
+        "description": "Validates and signs an invoice for a business.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "business_id": "3c673f28-baaa-4878-9ea3-f69f23eba462",
+                "irn": "INV00XXX-3D97BAAA-20240917",
+                "issue_date": "2024-09-17",
+                "issue_time": "10:30:00",
+                "invoice_type_code": "381",
+                "document_currency_code": "NGN",
+                "tax_currency_code": "NGN",
+                "invoice_delivery_period": {
+                  "start_date": "2024-09-17",
+                  "end_date": "2024-09-17"
+                },
+                "accounting_supplier_party": {
+                  "party_name": "Sample Supplier Ltd",
+                  "tin": "12345678-0001",
+                  "email": "supplier@example.com",
+                  "telephone": "+2348000000001",
+                  "postal_address": {
+                    "street_name": "1 Sample Street",
+                    "city_name": "Lagos",
+                    "postal_zone": "100001",
+                    "country": "NG"
+                  }
+                },
+                "accounting_customer_party": {
+                  "party_name": "Sample Customer Ltd",
+                  "tin": "87654321-0001",
+                  "email": "customer@example.com",
+                  "telephone": "+2348000000002",
+                  "postal_address": {
+                    "street_name": "2 Sample Avenue",
+                    "city_name": "Abuja",
+                    "postal_zone": "900001",
+                    "country": "NG"
+                  }
+                },
+                "legal_monetary_total": {
+                  "line_extension_amount": 10000,
+                  "tax_exclusive_amount": 10000,
+                  "tax_inclusive_amount": 10000,
+                  "payable_amount": 10000
+                },
+                "invoice_line": [
+                  {
+                    "hsn_code": "6901.00",
+                    "product_category": "Ceramic goods",
+                    "invoiced_quantity": 10,
+                    "line_extension_amount": 10000,
+                    "item": {
+                      "name": "Ceramic tile",
+                      "description": "Standard ceramic tile",
+                      "sellers_item_identification": "TILE-001"
+                    },
+                    "price": {
+                      "price_amount": 1000,
+                      "base_quantity": 1,
+                      "price_unit": "NGN per 1"
+                    }
+                  }
+                ],
+                "tax_total": [
+                  {
+                    "tax_amount": 0,
+                    "tax_subtotal": [
+                      {
+                        "taxable_amount": 10000,
+                        "tax_amount": 0,
+                        "tax_category": {
+                          "id": "ZERO_GST",
+                          "percent": 0
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "invoiceCategory": "B2C"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedInvoiceResponse"
+                },
+                "example": {
+                  "success": true,
+                  "status_code": 200,
+                  "message": "Invoice validated successfully!",
+                  "data": {
+                    "signedInvoice": {
+                      "ok": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400Validation"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404NotFound"
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/validate": {
+      "post": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Validate an Invoice's Details",
+        "operationId": "validateInvoice",
+        "description": "Validates invoice details. The documentation does not state whether a successful call stores the invoice.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvoiceRequest"
+              },
+              "example": {
+                "business_id": "3c673f28-baaa-4878-9ea3-f69f23eba462",
+                "irn": "INV00XXX-3D97BAAA-20240917",
+                "issue_date": "2024-09-17",
+                "issue_time": "10:30:00",
+                "invoice_type_code": "381",
+                "document_currency_code": "NGN",
+                "tax_currency_code": "NGN",
+                "invoice_delivery_period": {
+                  "start_date": "2024-09-17",
+                  "end_date": "2024-09-17"
+                },
+                "accounting_supplier_party": {
+                  "party_name": "Sample Supplier Ltd",
+                  "tin": "12345678-0001",
+                  "email": "supplier@example.com",
+                  "telephone": "+2348000000001",
+                  "postal_address": {
+                    "street_name": "1 Sample Street",
+                    "city_name": "Lagos",
+                    "postal_zone": "100001",
+                    "country": "NG"
+                  }
+                },
+                "accounting_customer_party": {
+                  "party_name": "Sample Customer Ltd",
+                  "tin": "87654321-0001",
+                  "email": "customer@example.com",
+                  "telephone": "+2348000000002",
+                  "postal_address": {
+                    "street_name": "2 Sample Avenue",
+                    "city_name": "Abuja",
+                    "postal_zone": "900001",
+                    "country": "NG"
+                  }
+                },
+                "legal_monetary_total": {
+                  "line_extension_amount": 10000,
+                  "tax_exclusive_amount": 10000,
+                  "tax_inclusive_amount": 10000,
+                  "payable_amount": 10000
+                },
+                "invoice_line": [
+                  {
+                    "hsn_code": "6901.00",
+                    "product_category": "Ceramic goods",
+                    "invoiced_quantity": 10,
+                    "line_extension_amount": 10000,
+                    "item": {
+                      "name": "Ceramic tile",
+                      "description": "Standard ceramic tile",
+                      "sellers_item_identification": "TILE-001"
+                    },
+                    "price": {
+                      "price_amount": 1000,
+                      "base_quantity": 1,
+                      "price_unit": "NGN per 1"
+                    }
+                  }
+                ],
+                "tax_total": [
+                  {
+                    "tax_amount": 0,
+                    "tax_subtotal": [
+                      {
+                        "taxable_amount": 10000,
+                        "tax_amount": 0,
+                        "tax_category": {
+                          "id": "ZERO_GST",
+                          "percent": 0
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "invoiceCategory": "B2C"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedInvoiceResponse"
+                },
+                "example": {
+                  "success": true,
+                  "status_code": 200,
+                  "message": "Invoice validated successfully!",
+                  "data": {
+                    "signedInvoice": {
+                      "ok": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400Validation"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404NotFound"
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/generateIRN": {
+      "post": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Generate Invoice IRN",
+        "operationId": "generateInvoiceIrn",
+        "description": "Generates an Invoice Reference Number (IRN) for an invoice to be signed.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "businessId": {
+                    "type": "string",
+                    "description": "Business external ID"
+                  },
+                  "invoiceId": {
+                    "type": "string",
+                    "description": "ID of the invoice to be signed"
+                  }
+                },
+                "required": [
+                  "businessId",
+                  "invoiceId"
+                ]
+              },
+              "example": {
+                "businessId": "3c673f28-baaa-4878-9ea3-f69f23eba462",
+                "invoiceId": "INV00XXX"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "IRN generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "irn": {
+                          "type": "string",
+                          "description": "Generated invoice reference number"
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status_code": 201,
+                  "message": "IRN generated successfully!",
+                  "data": {
+                    "irn": "INV00XXX-3D97BAAA-20240917"
+                  },
+                  "links": []
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404NotFound"
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/{irn}/confirm": {
+      "post": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Confirm Invoice Transmission",
+        "operationId": "confirmInvoiceTransmission",
+        "description": "Confirms the transmission of an invoice identified by its Invoice Reference Number (IRN).",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          },
+          {
+            "name": "irn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Invoice Reference Number (IRN) of the invoice to confirm"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "irn": {
+                    "type": "string",
+                    "description": "Invoice Reference Number (IRN) of the invoice to be confirmed"
+                  }
+                }
+              },
+              "example": {
+                "irn": "INV00XXX-3D97BAAA-20240917"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "confirmation": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status_code": 200,
+                  "message": "Invoice confirmed successfully!",
+                  "data": {
+                    "confirmation": {
+                      "ok": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404NotFound"
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/bulk": {
+      "post": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Bulk Invoice Validation",
+        "operationId": "bulkValidateInvoices",
+        "description": "Validates multiple invoices in one request. The response reports how many invoices were processed, how many passed, and which ones failed with field-level errors. A batch can partly succeed.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "invoices": {
+                    "type": "array",
+                    "description": "Array of invoice objects to process",
+                    "items": {
+                      "$ref": "#/components/schemas/BulkInvoiceItem"
+                    }
+                  }
+                },
+                "required": [
+                  "invoices"
+                ]
+              },
+              "example": {
+                "invoices": [
+                  {
+                    "business_id": "3c673f28-baaa-4878-9ea3-f69f23eba462",
+                    "irn": "INV00XXX-3D97BAAA-20240917",
+                    "issue_date": "2024-09-17",
+                    "issue_time": "10:30:00",
+                    "invoice_type_code": "381",
+                    "document_currency_code": "NGN",
+                    "tax_currency_code": "NGN",
+                    "invoice_delivery_period": {
+                      "start_date": "2024-09-17",
+                      "end_date": "2024-09-17"
+                    },
+                    "accounting_supplier_party": {
+                      "party_name": "Sample Supplier Ltd",
+                      "tin": "12345678-0001",
+                      "email": "supplier@example.com",
+                      "telephone": "+2348000000001",
+                      "postal_address": {
+                        "street_name": "1 Sample Street",
+                        "city_name": "Lagos",
+                        "postal_zone": "100001",
+                        "country": "NG"
+                      }
+                    },
+                    "accounting_customer_party": {
+                      "party_name": "Sample Customer Ltd",
+                      "tin": "87654321-0001",
+                      "email": "customer@example.com",
+                      "telephone": "+2348000000002",
+                      "postal_address": {
+                        "street_name": "2 Sample Avenue",
+                        "city_name": "Abuja",
+                        "postal_zone": "900001",
+                        "country": "NG"
+                      }
+                    },
+                    "legal_monetary_total": {
+                      "line_extension_amount": 10000,
+                      "tax_exclusive_amount": 10000,
+                      "tax_inclusive_amount": 10000,
+                      "payable_amount": 10000
+                    },
+                    "invoice_line": [
+                      {
+                        "hsn_code": "6901.00",
+                        "product_category": "Ceramic goods",
+                        "invoiced_quantity": 10,
+                        "line_extension_amount": 10000,
+                        "item": {
+                          "name": "Ceramic tile",
+                          "description": "Standard ceramic tile",
+                          "sellers_item_identification": "TILE-001"
+                        },
+                        "price": {
+                          "price_amount": 1000,
+                          "base_quantity": 1,
+                          "price_unit": "NGN per 1"
+                        }
+                      }
+                    ],
+                    "tax_total": [
+                      {
+                        "tax_amount": 0,
+                        "tax_subtotal": [
+                          {
+                            "taxable_amount": 10000,
+                            "tax_amount": 0,
+                            "tax_category": {
+                              "id": "ZERO_GST",
+                              "percent": 0
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "invoiceCategory": "B2C"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status_code": {
+                      "type": "integer"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "summary": {
+                          "type": "object",
+                          "properties": {
+                            "totalProcessed": {
+                              "type": "integer"
+                            },
+                            "totalValidated": {
+                              "type": "integer"
+                            },
+                            "totalValidationErrors": {
+                              "type": "integer"
+                            }
+                          }
+                        },
+                        "details": {
+                          "type": "object",
+                          "properties": {
+                            "validatedInvoices": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "invoiceId": {
+                                    "type": "string"
+                                  },
+                                  "irn": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            },
+                            "validationErrors": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "irn": {
+                                    "type": "string"
+                                  },
+                                  "errors": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/components/schemas/FieldError"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "status_code": 200,
+                  "message": "Bulk validation completed.",
+                  "data": {
+                    "summary": {
+                      "totalProcessed": 10,
+                      "totalValidated": 8,
+                      "totalValidationErrors": 2
+                    },
+                    "details": {
+                      "validatedInvoices": [
+                        {
+                          "invoiceId": "INV00XXX",
+                          "irn": "INV00XXX-3D97BAAA-20240917"
+                        }
+                      ],
+                      "validationErrors": [
+                        {
+                          "irn": "INV00YYY-3D97BAAA-20240917",
+                          "errors": [
+                            {
+                              "field": "tax_total",
+                              "message": "Tax amount is required."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. The request body must contain an array of invoices.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "success": false,
+                  "status_code": 400,
+                  "message": "Request body must contain an array of invoices."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/api/invoices/tax-categories": {
+      "get": {
+        "tags": [
+          "Invoicing"
+        ],
+        "summary": "Retrieve Tax Categories",
+        "operationId": "getTaxCategories",
+        "description": "Returns the list of available tax categories for invoices.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API Secret Key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "taxCategories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "taxCategories": [
+                    {
+                      "code": "STANDARD_GST",
+                      "value": "Standard goods and services tax"
+                    },
+                    {
+                      "code": "REDUCED_GST",
+                      "value": "Reduced goods and services tax"
+                    },
+                    {
+                      "code": "ZERO_GST",
+                      "value": "Zero-rated goods and services tax"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "authorization",
+        "description": "Your BeelPoint API Secret Key."
+      }
+    },
+    "schemas": {
+      "PostalAddress": {
+        "type": "object",
+        "properties": {
+          "street_name": {
+            "type": "string",
+            "description": "Street name"
+          },
+          "city_name": {
+            "type": "string",
+            "description": "City name"
+          },
+          "postal_zone": {
+            "type": "string",
+            "description": "Postal or ZIP code"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country"
+          }
+        }
+      },
+      "Party": {
+        "type": "object",
+        "description": "Supplier or customer details.",
+        "properties": {
+          "party_name": {
+            "type": "string",
+            "description": "Name of the party"
+          },
+          "tin": {
+            "type": "string",
+            "description": "Tax Identification Number (TIN)"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address",
+            "format": "email"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Telephone number"
+          },
+          "business_description": {
+            "type": "string",
+            "description": "Description of the business"
+          },
+          "postal_address": {
+            "$ref": "#/components/schemas/PostalAddress"
+          }
+        }
+      },
+      "PartyResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "party_name": {
+            "type": "string"
+          },
+          "tin": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "postal_address": {
+            "$ref": "#/components/schemas/PostalAddress"
+          }
+        }
+      },
+      "TaxCategory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Tax category code, for example ZERO_GST. See Retrieve Tax Categories."
+          },
+          "percent": {
+            "type": "number",
+            "description": "Tax rate as a percentage"
+          }
+        }
+      },
+      "TaxSubtotal": {
+        "type": "object",
+        "properties": {
+          "taxable_amount": {
+            "type": "number"
+          },
+          "tax_amount": {
+            "type": "number"
+          },
+          "tax_category": {
+            "$ref": "#/components/schemas/TaxCategory"
+          }
+        }
+      },
+      "TaxTotal": {
+        "type": "object",
+        "properties": {
+          "tax_amount": {
+            "type": "number",
+            "description": "Total tax amount"
+          },
+          "tax_subtotal": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxSubtotal"
+            }
+          }
+        }
+      },
+      "MonetaryTotal": {
+        "type": "object",
+        "description": "Invoice totals.",
+        "properties": {
+          "line_extension_amount": {
+            "type": "number",
+            "description": "Sum of line amounts before tax"
+          },
+          "tax_exclusive_amount": {
+            "type": "number",
+            "description": "Total excluding tax"
+          },
+          "tax_inclusive_amount": {
+            "type": "number",
+            "description": "Total including tax"
+          },
+          "payable_amount": {
+            "type": "number",
+            "description": "Amount payable"
+          }
+        },
+        "required": [
+          "line_extension_amount",
+          "tax_exclusive_amount",
+          "tax_inclusive_amount",
+          "payable_amount"
+        ]
+      },
+      "InvoiceLine": {
+        "type": "object",
+        "properties": {
+          "hsn_code": {
+            "type": "string",
+            "description": "Harmonized System of Nomenclature (HSN) code. See Retrieve HSN codes."
+          },
+          "product_category": {
+            "type": "string",
+            "description": "Product category"
+          },
+          "discount_rate": {
+            "type": "number",
+            "description": "Discount rate"
+          },
+          "discount_amount": {
+            "type": "number",
+            "description": "Discount amount"
+          },
+          "fee_rate": {
+            "type": "number",
+            "description": "Fee rate"
+          },
+          "fee_amount": {
+            "type": "number",
+            "description": "Fee amount"
+          },
+          "invoiced_quantity": {
+            "type": "number",
+            "description": "Quantity invoiced"
+          },
+          "line_extension_amount": {
+            "type": "number",
+            "description": "Line amount before tax"
+          },
+          "item": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Item name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Item description"
+              },
+              "sellers_item_identification": {
+                "type": "string",
+                "description": "Seller's item identifier"
+              }
+            }
+          },
+          "price": {
+            "type": "object",
+            "properties": {
+              "price_amount": {
+                "type": "number",
+                "description": "Unit price"
+              },
+              "base_quantity": {
+                "type": "number",
+                "description": "Base quantity the price applies to"
+              },
+              "price_unit": {
+                "type": "string",
+                "description": "Price unit"
+              }
+            }
+          }
+        },
+        "required": [
+          "invoiced_quantity",
+          "line_extension_amount",
+          "item",
+          "price"
+        ]
+      },
+      "DocumentReference": {
+        "type": "object",
+        "properties": {
+          "irn": {
+            "type": "string",
+            "description": "Invoice reference number"
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "InvoiceRequest": {
+        "type": "object",
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "description": "Business external ID"
+          },
+          "irn": {
+            "type": "string",
+            "description": "Invoice reference number (IRN)"
+          },
+          "issue_date": {
+            "type": "string",
+            "description": "Date the invoice was issued",
+            "format": "date"
+          },
+          "issue_time": {
+            "type": "string",
+            "description": "Time the invoice was issued, format HH:MM:SS"
+          },
+          "invoice_type_code": {
+            "type": "string",
+            "description": "Invoice type code. See Retrieve Invoice Types."
+          },
+          "document_currency_code": {
+            "type": "string",
+            "description": "Currency of the invoice, for example NGN"
+          },
+          "invoice_delivery_period": {
+            "type": "object",
+            "properties": {
+              "start_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "start_date"
+            ]
+          },
+          "legal_monetary_total": {
+            "$ref": "#/components/schemas/MonetaryTotal"
+          },
+          "invoice_line": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          },
+          "due_date": {
+            "type": "string",
+            "description": "Payment due date",
+            "format": "date"
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Payment status. Default: PENDING.",
+            "default": "PENDING"
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional notes"
+          },
+          "tax_point_date": {
+            "type": "string",
+            "description": "Date tax is due",
+            "format": "date"
+          },
+          "tax_currency_code": {
+            "type": "string",
+            "description": "Currency code for tax"
+          },
+          "accounting_cost": {
+            "type": "string",
+            "description": "Accounting cost information"
+          },
+          "order_reference": {
+            "type": "string",
+            "description": "Order reference details"
+          },
+          "billing_reference": {
+            "type": "array",
+            "description": "Billing references",
+            "items": {
+              "type": "object"
+            }
+          },
+          "dispatch_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "receipt_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "originator_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "contract_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "document_reference": {
+            "type": "array",
+            "description": "Document references",
+            "items": {
+              "type": "object"
+            }
+          },
+          "accounting_supplier_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "accounting_customer_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "actual_delivery_date": {
+            "type": "string",
+            "description": "Actual delivery date",
+            "format": "date"
+          },
+          "payment_means": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "payment_means_code": {
+                  "type": "string"
+                },
+                "payment_due_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "payment_terms_note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "allowance_charge": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "charge_indicator": {
+                  "type": "boolean",
+                  "description": "True for a charge, false for an allowance"
+                },
+                "amount": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "tax_total": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxTotal"
+            }
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer identifier (appears in documented examples)"
+          },
+          "paymentDetails": {
+            "type": "object",
+            "description": "Payment details (appears in documented examples; structure not documented)"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Invoice subject (appears in documented examples)"
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "description": "Your invoice number (appears in documented examples)"
+          },
+          "invoiceCategory": {
+            "type": "string",
+            "description": "Invoice category, for example B2B, B2C or B2G. See Invoice Categories Options."
+          }
+        },
+        "required": [
+          "business_id",
+          "irn",
+          "issue_date",
+          "issue_time",
+          "invoice_type_code",
+          "document_currency_code",
+          "invoice_delivery_period",
+          "legal_monetary_total",
+          "invoice_line"
+        ]
+      },
+      "BulkInvoiceItem": {
+        "type": "object",
+        "description": "One invoice in a bulk validation request.",
+        "properties": {
+          "business_id": {
+            "type": "string",
+            "description": "Business external ID"
+          },
+          "irn": {
+            "type": "string",
+            "description": "Invoice reference number (IRN)"
+          },
+          "issue_date": {
+            "type": "string",
+            "description": "Date the invoice was issued",
+            "format": "date"
+          },
+          "issue_time": {
+            "type": "string",
+            "description": "Time the invoice was issued, format HH:MM:SS"
+          },
+          "invoice_type_code": {
+            "type": "string",
+            "description": "Invoice type code. See Retrieve Invoice Types."
+          },
+          "document_currency_code": {
+            "type": "string",
+            "description": "Currency of the invoice, for example NGN"
+          },
+          "invoice_delivery_period": {
+            "type": "object",
+            "properties": {
+              "start_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "start_date"
+            ]
+          },
+          "legal_monetary_total": {
+            "$ref": "#/components/schemas/MonetaryTotal"
+          },
+          "invoice_line": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            }
+          },
+          "due_date": {
+            "type": "string",
+            "description": "Payment due date",
+            "format": "date"
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "Payment status. Default: PENDING.",
+            "default": "PENDING"
+          },
+          "note": {
+            "type": "string",
+            "description": "Additional notes"
+          },
+          "tax_point_date": {
+            "type": "string",
+            "description": "Date tax is due",
+            "format": "date"
+          },
+          "tax_currency_code": {
+            "type": "string",
+            "description": "Currency code for tax"
+          },
+          "accounting_cost": {
+            "type": "string",
+            "description": "Accounting cost information"
+          },
+          "order_reference": {
+            "type": "string",
+            "description": "Order reference details"
+          },
+          "billing_reference": {
+            "type": "array",
+            "description": "Billing references",
+            "items": {
+              "type": "object"
+            }
+          },
+          "dispatch_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "receipt_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "originator_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "contract_document_reference": {
+            "$ref": "#/components/schemas/DocumentReference"
+          },
+          "document_reference": {
+            "type": "array",
+            "description": "Document references",
+            "items": {
+              "type": "object"
+            }
+          },
+          "accounting_supplier_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "accounting_customer_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "actual_delivery_date": {
+            "type": "string",
+            "description": "Actual delivery date",
+            "format": "date"
+          },
+          "payment_means": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "payment_means_code": {
+                  "type": "string"
+                },
+                "payment_due_date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "payment_terms_note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "allowance_charge": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "charge_indicator": {
+                  "type": "boolean",
+                  "description": "True for a charge, false for an allowance"
+                },
+                "amount": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "tax_total": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaxTotal"
+            }
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "Customer identifier (appears in documented examples)"
+          },
+          "paymentDetails": {
+            "type": "object",
+            "description": "Payment details (appears in documented examples; structure not documented)"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Invoice subject (appears in documented examples)"
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "description": "Your invoice number (appears in documented examples)"
+          },
+          "invoiceCategory": {
+            "type": "string",
+            "description": "Invoice category, for example B2B, B2C or B2G. See Invoice Categories Options."
+          }
+        },
+        "required": [
+          "accounting_supplier_party",
+          "accounting_customer_party",
+          "tax_total",
+          "legal_monetary_total",
+          "invoice_line"
+        ]
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "legal_monetary_total": {
+            "type": "object",
+            "properties": {
+              "line_extension_amount": {
+                "type": "object",
+                "properties": {
+                  "$numberDecimal": {
+                    "type": "string"
+                  }
+                }
+              },
+              "tax_exclusive_amount": {
+                "type": "object",
+                "properties": {
+                  "$numberDecimal": {
+                    "type": "string"
+                  }
+                }
+              },
+              "tax_inclusive_amount": {
+                "type": "object",
+                "properties": {
+                  "$numberDecimal": {
+                    "type": "string"
+                  }
+                }
+              },
+              "payable_amount": {
+                "type": "object",
+                "properties": {
+                  "$numberDecimal": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "payment_status": {
+            "type": "string",
+            "description": "For example PENDING or PAID"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "irn": {
+            "type": "string",
+            "description": "Invoice reference number"
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "invoice_type_code": {
+            "type": "string"
+          },
+          "document_currency_code": {
+            "type": "string",
+            "description": "For example NGN"
+          },
+          "tax_currency_code": {
+            "type": "string"
+          },
+          "accounting_supplier_party": {
+            "$ref": "#/components/schemas/PartyResponse"
+          },
+          "accounting_customer_party": {
+            "$ref": "#/components/schemas/PartyResponse"
+          },
+          "invoice_line": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "hsn_code": {
+                  "type": "string"
+                },
+                "product_category": {
+                  "type": "string"
+                },
+                "invoiced_quantity": {
+                  "type": "number"
+                },
+                "line_extension_amount": {
+                  "type": "number"
+                },
+                "item": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "sellers_item_identification": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "price": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string"
+                    },
+                    "price_amount": {
+                      "type": "number"
+                    },
+                    "base_quantity": {
+                      "type": "number"
+                    },
+                    "price_unit": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "tax_total": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "tax_amount": {
+                  "type": "object",
+                  "properties": {
+                    "$numberDecimal": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "tax_subtotal": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "taxable_amount": {
+                        "type": "number"
+                      },
+                      "tax_amount": {
+                        "type": "number"
+                      },
+                      "tax_category": {
+                        "type": "object",
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "percent": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "billing_reference": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "_document_reference": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "payment_means": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "allowance_charge": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "totalDocs": {
+            "type": "integer"
+          },
+          "perPage": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "currentPage": {
+            "type": "integer"
+          }
+        }
+      },
+      "FieldError": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "statusCode": {
+            "type": "integer"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "errors": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FieldError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SignedInvoiceResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "signedInvoice": {
+                "type": "object"
+              },
+              "confirmation": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "Error404NotFound": {
+        "description": "Not Found. The resource you attempted to access does not exist.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "statusCode": 404,
+              "message": "You have attempted to get a resource that does not exist.",
+              "name": "ResourceNotFoundError",
+              "data": {}
+            }
+          }
+        }
+      },
+      "Error400Validation": {
+        "description": "Validation failed. `data.errors` lists each failing field.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationErrorResponse"
+            },
+            "example": {
+              "success": false,
+              "status_code": 400,
+              "message": "Validation failed.",
+              "data": {
+                "errors": [
+                  {
+                    "field": "invoice_line.hsn_code",
+                    "message": "HSN code is required."
+                  },
+                  {
+                    "field": "invoice_line.product_category",
+                    "message": "Product category is required."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
