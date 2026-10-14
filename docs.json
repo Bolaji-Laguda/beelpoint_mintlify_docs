@@ -22,6 +22,10 @@
         "pages": [
           "invoicing/invoice-categories"
         ]
+      },
+      {
+        "group": "API",
+        "openapi": "api-reference/beelpoint-openapi.json"
       }
     ]
   },
