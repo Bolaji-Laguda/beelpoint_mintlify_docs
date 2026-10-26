@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "willow",
   "name": "BeelPoint",
   "colors": {
     "primary": "#16A34A",
@@ -30,8 +30,8 @@
     ]
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/images/beelpoint_logo.jpeg",
+    "dark": "/images/beelpoint_logo.jpeg"
   },
   "navbar": {
     "links": [
@@ -65,5 +65,12 @@
       "linkedin": "https://linkedin.com/company/mintlify"
     }
   },
-  "description": "BeelPoint API documentation: e-invoicing and tax compliance in Nigeria."
+  "description": "BeelPoint API documentation: e-invoicing and tax compliance in Nigeria.",
+  "background": {
+    "image": "/images/bannerbeelpoint.png",
+    "decoration": "gradient"
+  },
+  "icons": {
+    "library": "lucide"
+  }
 }
