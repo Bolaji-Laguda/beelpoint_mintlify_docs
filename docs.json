@@ -3,9 +3,9 @@
   "theme": "willow",
   "name": "BeelPoint",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0E5FD6",
+    "light": "#0E5FD6",
+    "dark": "#0E5FD6"
   },
   "favicon": "/favicon.svg",
   "navigation": {
